@@ -865,11 +865,14 @@
 </script>
 
 <audio id="introMusic" preload="auto" loop>
-  <source src="assets/audio/Aylex - Where We Belong (freetouse.com).mp3" type="audio/mpeg">
+  <source src="assets/audio/intro-music.mp3" type="audio/mpeg">
+  Your browser does not support the audio element.
 </audio>
 
 <script>
-/* Music Controller */
+/* ============================================================
+   FIXED: Music Controller for Hosting
+   ============================================================ */
 (function () {
   const music = document.getElementById("introMusic");
   if (!music) return;
@@ -882,15 +885,30 @@
 
     music.volume = 0.35;
 
-    music.play().catch(err => {
-      console.log("Music blocked:", err);
-    });
+    // Force load
+    music.load();
+
+    const playPromise = music.play();
+    
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => console.log("✅ Background music started"))
+        .catch(err => {
+          console.log("Music autoplay blocked:", err);
+          // Optional: Show a "Click to play music" button
+        });
+    }
   }
 
-  window.addEventListener("scroll", startMusic, {
-  once: true,
-  passive: true
-});
+  // Try multiple ways to trigger (more reliable on hosting)
+  window.addEventListener("scroll", startMusic, { once: true, passive: true });
+  window.addEventListener("touchstart", startMusic, { once: true, passive: true });
+  window.addEventListener("click", startMusic, { once: true });
+
+  // Fallback: Start after 2 seconds if user is active
+  setTimeout(() => {
+    if (!started) startMusic();
+  }, 2000);
 })();
 </script>
 
