@@ -818,7 +818,7 @@
         videoProxy.time = self.progress * video.duration;
         gsap.to(video, {
           currentTime: videoProxy.time,
-          duration: 0.2,
+          duration: 0.1,
           overwrite: "auto",
           ease: "none"
         });
@@ -826,7 +826,7 @@
     });
   }
 
-  if (video.readyState >= 1) {
+  if (video.readyState >= 4) {
     initScrub();
   } else {
     video.addEventListener("loadedmetadata", initScrub, { once: true });
