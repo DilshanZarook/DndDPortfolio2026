@@ -137,7 +137,62 @@
 
   
 </style>
-</head><body>
+<link href="https://fonts.googleapis.com/css?family=Cabin+Condensed:700" rel="stylesheet" type="text/css">
+<style>
+  #loadingScreen {
+    position: fixed; inset: 0; z-index: 5000;
+    background: #141414;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+  }
+  #loadingScreen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+  .loading-name {
+    font-family: 'Cabin Condensed', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: clamp(48px, 10vw, 140px);
+    line-height: 1;
+    text-align: center;
+    padding: 0 1rem;
+    --progress: 0%;
+    background-image: linear-gradient(to right,
+      #fff 0%, #fff var(--progress),
+      rgba(255,255,255,0.15) var(--progress), rgba(255,255,255,0.15) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .loading-percent {
+    margin-top: 1.5rem;
+    font-family: 'Cabin Condensed', sans-serif;
+    color: rgba(255,255,255,0.7);
+    font-size: 16px;
+    letter-spacing: 0.05em;
+  }
+
+  .enter-prompt {
+    margin-top: 2.5rem;
+    font-family: 'Cabin Condensed', sans-serif;
+    color: #fff;
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  .enter-prompt.visible { opacity: 1; animation: pulse 1.6s ease-in-out infinite; }
+  .enter-prompt span { border: 1px solid rgba(255,255,255,0.4); padding: 2px 8px; border-radius: 4px; margin: 0 2px; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+</style>
+</head>
+<body>
+  <div id="loadingScreen">
+  <div class="loading-name" id="loadingName">Dilshan Zarook</div>
+  <div class="loading-percent" id="loadingPercent">loading... 0%</div>
+  <div class="enter-prompt" id="enterPrompt">Press <span>Enter</span> or tap to continue</div>
+</div>
 <!-- ADDED: floating island nav (fixed, sits above all page content) -->
 <div class="island-nav">
   <div class="island">
@@ -314,7 +369,7 @@
 </style>
 <section class="section gallery-section">
   <div class="gallery-intro">
-    <div class="body-text-5 caps">/ Selected Work — scroll</div>
+    <div class="body-text-5 caps"></div>
   </div>
   <div class="gallery-wrap">
     <div class="gallery gallery--bento gallery--switch" id="gallery-portfolio">
@@ -900,6 +955,8 @@
     }
   }
 
+  window.startMusic = startMusic;
+
   // Try multiple ways to trigger (more reliable on hosting)
   window.addEventListener("scroll", startMusic, { once: true, passive: true });
   window.addEventListener("touchstart", startMusic, { once: true, passive: true });
@@ -909,6 +966,122 @@
   setTimeout(() => {
     if (!started) startMusic();
   }, 2000);
+})();
+</script>
+
+<script>
+(function () {
+  const screen = document.getElementById("loadingScreen");
+  const nameEl = document.getElementById("loadingName");
+  const percentEl = document.getElementById("loadingPercent");
+  const promptEl = document.getElementById("enterPrompt");
+  if (!screen) return;
+
+  document.body.style.overflow = "hidden"; // lock page behind the loader
+
+  let progress = 0;
+  let pageLoaded = false;
+  let ready = false;
+
+  window.addEventListener("load", () => { pageLoaded = true; });
+
+  const timer = setInterval(() => {
+    const cap = pageLoaded ? 100 : 90;
+    progress = Math.min(cap, progress + (cap - progress) * 0.12 + 0.4);
+    const pct = Math.floor(progress);
+    nameEl.style.setProperty("--progress", pct + "%");
+    percentEl.textContent = "loading... " + pct + "%";
+
+    if (progress >= 99.5 && pageLoaded && !ready) {
+      ready = true;
+      clearInterval(timer);
+      nameEl.style.setProperty("--progress", "100%");
+      percentEl.textContent = "loading... 100%";
+      promptEl.classList.add("visible");
+    }
+  }, 80);
+
+  function enterSite(e) {
+  if (!ready) return;
+  
+  screen.classList.add("hidden");
+  document.body.style.overflow = "";
+
+  // === MUSIC PLAY (Stronger user gesture handling) ===
+  const music = document.getElementById("introMusic");
+  if (music) {
+    music.volume = 0.35;
+    
+    // Small delay + direct play attempt
+    setTimeout(() => {
+      const playPromise = music.play();
+      
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => console.log("✅ Music started successfully"))
+          .catch((err) => {
+            console.log("Music still blocked, retrying...", err);
+            // Final retry with another user gesture friendly call
+            setTimeout(() => music.play().catch(() => {}), 300);
+          });
+      }
+    }, 100);
+  }
+
+  // === Auto Scroll (same as before) ===
+  const startY = window.scrollY;
+  const targetY = window.innerHeight * 1.12;
+  const durationDown = 5400;
+  const durationUp   = 3600;
+  let autoScrolling = true;
+
+  const cancel = () => { autoScrolling = false; };
+  window.addEventListener("wheel", cancel, { once: true, passive: true });
+  window.addEventListener("touchmove", cancel, { once: true, passive: true });
+
+  function easeOutCubic(t) {
+    return 1 - Math.pow(1 - t, 3);
+  }
+
+  const startTimeDown = performance.now();
+
+  function scrollDown(now) {
+    if (!autoScrolling) return;
+    const t = Math.min(1, (now - startTimeDown) / durationDown);
+    const eased = easeOutCubic(t);
+    window.scrollTo(0, startY + (targetY - startY) * eased);
+
+    if (t < 1) {
+      requestAnimationFrame(scrollDown);
+    } else {
+      setTimeout(scrollBackUp, 600);
+    }
+  }
+
+  function scrollBackUp() {
+    if (!autoScrolling) return;
+    const startYUp = window.scrollY;
+    const startTimeUp = performance.now();
+
+    function stepUp(now) {
+      if (!autoScrolling) return;
+      const t = Math.min(1, (now - startTimeUp) / durationUp);
+      const eased = easeOutCubic(t);
+      window.scrollTo(0, startYUp * (1 - eased));
+      if (t < 1) requestAnimationFrame(stepUp);
+    }
+    requestAnimationFrame(stepUp);
+  }
+
+  requestAnimationFrame(scrollDown);
+}
+
+  // Replace old listeners with this:
+screen.addEventListener("click", enterSite, { passive: true });
+screen.addEventListener("touchstart", enterSite, { passive: true });
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") enterSite(e);
+});
 })();
 </script>
 
