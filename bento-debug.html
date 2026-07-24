@@ -49,11 +49,13 @@
       gap: 8px;
       grid-template-columns: repeat(3, 32vw);
       grid-template-rows: repeat(4, 22vh);
+      justify-content: center;
+      align-content: center;
     }
 
     .gallery--final.gallery--bento {
       grid-template-columns: repeat(3, 100vw);
-      grid-template-rows: repeat(4, 50dvh);
+      grid-template-rows: repeat(4, 49.5dvh);
       gap: 8px;
     }
 
@@ -65,15 +67,6 @@
     .gallery--bento .gallery__item:nth-child(6) { grid-area: 3/3/5/4; }
     .gallery--bento .gallery__item:nth-child(7) { grid-area: 4/1/5/2; }
     .gallery--bento .gallery__item:nth-child(8) { grid-area: 4/2/5/3; }
-
-    .gallery-wrap {
-        height: 100dvh;
-        min-height: 100dvh;
-        }
-
-    .gallery--final.gallery--bento {
-    grid-template-rows: repeat(4, 49.5dvh);
-    }
   </style>
 </head>
 <body>
@@ -99,49 +92,54 @@
   let flipCtx;
 
   const createTween = () => {
-    const galleryElement = document.querySelector("#gallery-8");
-    const galleryItems = galleryElement.querySelectorAll(".gallery__item");
+    const gallery = document.getElementById("gallery-8");
+    const items = gallery.querySelectorAll(".gallery__item");
 
+    // Full cleanup
     if (flipCtx) flipCtx.revert();
+    ScrollTrigger.getAll().forEach(st => st.kill());
 
-    // Start in small state
-    galleryElement.classList.remove("gallery--final");
+    // FORCE small bento state
+    gallery.classList.remove("gallery--final");
+    gsap.set(items, { clearProps: "all" });
 
-    flipCtx = gsap.context(() => {
-      // Capture small (bento) state FIRST
-      const startState = Flip.getState(galleryItems);
+    // Small delay to let DOM settle
+    setTimeout(() => {
+      flipCtx = gsap.context(() => {
+        // 1. Capture the FINAL (fullscreen) layout as the destination state
+        gallery.classList.add("gallery--final");
+        const finalState = Flip.getState(items);
 
-      // Go to expanded state
-      galleryElement.classList.add("gallery--final");
+        // 2. Snap back to the small bento layout (no animation, instant)
+        gallery.classList.remove("gallery--final");
 
-      // Flip from small → large
-      const flip = Flip.to(startState, {
-        simple: true,
-        ease: "power2.inOut",        // smoother on mobile
-        duration: 1.2
+        // 3. Animate FROM the current (small) layout TO the captured final state
+        Flip.to(finalState, {
+          simple: true,
+          ease: "power2.inOut",
+          duration: 1.2,
+          scrollTrigger: {
+            trigger: gallery.parentNode,
+            start: "top top",
+            end: "+=180%",
+            scrub: 1.2,
+            pin: true,
+            pinSpacing: true,
+            invalidateOnRefresh: true,
+          }
+        });
       });
-
-      gsap.timeline({
-        scrollTrigger: {
-          trigger: galleryElement.parentNode,
-          start: "top top",
-          end: "+=150%",
-          scrub: 1,
-          pin: true,
-          pinSpacing: true,
-          invalidateOnRefresh: true
-        }
-      }).add(flip);
-    });
+    }, 100);
   };
 
   window.addEventListener("load", () => {
     ScrollTrigger.config({ ignoreMobileResize: true });
+    ScrollTrigger.normalizeScroll(true);
     createTween();
   });
 
-  window.addEventListener("resize", () => setTimeout(createTween, 300));
-  window.addEventListener("orientationchange", () => setTimeout(createTween, 500));
+  window.addEventListener("resize", () => setTimeout(createTween, 500));
+  window.addEventListener("orientationchange", () => setTimeout(createTween, 700));
 </script>
 </body>
 </html>
