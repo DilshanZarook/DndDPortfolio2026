@@ -1074,6 +1074,11 @@
   }
 
   requestAnimationFrame(scrollDown);
+  // Force clean reset
+  setTimeout(() => {
+    ScrollTrigger.getAll().forEach(st => st.kill());
+    ScrollTrigger.refresh(true);   // hard refresh
+  }, 600);
 }
 
   // Replace old listeners with this:
