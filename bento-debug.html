@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bento Gallery Debug</title>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/Flip.min.js"></script>
+
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:#030303; color:#fff; font-family:sans-serif; overflow-x:hidden; }
+
+    .gallery-wrap {
+      position: relative;
+      width: 100%;
+      height: 100dvh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #030303;
+      overflow: hidden;
+    }
+
+    .gallery {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .gallery__item {
+      background-position: 50% 50%;
+      background-size: cover;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gallery__item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Bento Grid */
+    .gallery--bento {
+      display: grid;
+      gap: 1vh;
+      grid-template-columns: repeat(3, 32.5vw);
+      grid-template-rows: repeat(4, 23vh);
+      justify-content: center;
+      align-content: center;
+    }
+
+    .gallery--final.gallery--bento {
+      grid-template-columns: repeat(3, 100vw);
+      grid-template-rows: repeat(4, 49.5dvh);
+      gap: 1vh;
+    }
+
+    /* Grid positions */
+    .gallery--bento .gallery__item:nth-child(1) { grid-area: 1 / 1 / 3 / 2; }
+    .gallery--bento .gallery__item:nth-child(2) { grid-area: 1 / 2 / 2 / 3; }
+    .gallery--bento .gallery__item:nth-child(3) { grid-area: 2 / 2 / 4 / 3; }
+    .gallery--bento .gallery__item:nth-child(4) { grid-area: 1 / 3 / 3 / 3; }
+    .gallery--bento .gallery__item:nth-child(5) { grid-area: 3 / 1 / 3 / 2; }
+    .gallery--bento .gallery__item:nth-child(6) { grid-area: 3 / 3 / 5 / 4; }
+    .gallery--bento .gallery__item:nth-child(7) { grid-area: 4 / 1 / 5 / 2; }
+    .gallery--bento .gallery__item:nth-child(8) { grid-area: 4 / 2 / 5 / 3; }
+
+    .info {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 100;
+      background: rgba(0,0,0,0.7);
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="info">
+    Scroll down slowly<br>
+    <strong>Bento Debug Test</strong>
+  </div>
+
+  <div class="gallery-wrap">
+    <div class="gallery gallery--bento gallery--switch" id="gallery-portfolio">
+      <div class="gallery__item">
+        <img src="https://cdn.prod.website-files.com/6a3a74cb28361aa04919bd50/6a3a74cb28361aa04919bdd4_Thumb_1.webp" alt="">
+      </div>
+      <div class="gallery__item">
+        <img src="https://cdn.prod.website-files.com/6a3a74cb28361aa04919bd50/6a3a9e505ccbb6724d307ada_ChatGPT%20Image%20Jun%2023%2C%202026%2C%2008_24_46%20PM.png" alt="">
+      </div>
+      <div class="gallery__item">
+        <img src="https://cdn.prod.website-files.com/6a3a74cb28361aa04919bd50/6a3a9fdf2c5b918a928e7e87_ChatGPT%20Image%20Jun%2023%2C%202026%2C%2008_31_22%20PM.png" alt="">
+      </div>
+      <div class="gallery__item">
+        <img src="https://cdn.prod.website-files.com/6a3a74cb28361aa04919bd50/6a3a74cb28361aa04919be41_Thumb_1.webp" alt="">
+      </div>
+      <div class="gallery__item">
+        <img src="https://cdn.prod.website-files.com/6a3a74cb28361aa04919bd50/6a3a9c08af98b1838c465db1_4ad1e91e-5836-4062-b02f-31496d32a3cf.png" alt="">
+      </div>
+      <div class="gallery__item">
+        <img src="https://cdn.prod.website-files.com/6a3a74cb28361aa04919bd50/6a3aa2eaddee3d309966dbb3_ChatGPT%20Image%20Jun%2023%2C%202026%2C%2008_43_46%20PM.png" alt="">
+      </div>
+      <div class="gallery__item">
+        <img src="https://cdn.prod.website-files.com/6a3a74cb28361aa04919bd50/6a3a74cb28361aa04919bdf4_Thumb_2.webp" alt="">
+      </div>
+      <div class="gallery__item">
+        <img src="https://cdn.prod.website-files.com/6a3a74cb28361aa04919bd50/6a3a74cb28361aa04919be42_Thumb_2.webp" alt="">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    gsap.registerPlugin(ScrollTrigger, Flip);
+
+    let flipCtx;
+
+    function initBento() {
+      if (flipCtx) flipCtx.revert();
+
+      const gallery = document.getElementById("gallery-portfolio");
+      const wrap = gallery.closest(".gallery-wrap");
+      const items = gallery.querySelectorAll(".gallery__item");
+
+      gallery.classList.remove("gallery--final");
+
+      flipCtx = gsap.context(() => {
+        const state = Flip.getState(items);
+
+        gallery.classList.add("gallery--final");
+
+        Flip.to(state, {
+          duration: 1.1,
+          ease: "power2.inOut",
+          simple: true,
+          scrollTrigger: {
+            trigger: wrap,
+            start: "top top",
+            end: "+=160%",
+            scrub: 1,
+            pin: true,
+            pinSpacing: true,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+          }
+        });
+      });
+    }
+
+    window.addEventListener("load", initBento);
+    window.addEventListener("resize", () => setTimeout(initBento, 300));
+    window.addEventListener("orientationchange", () => setTimeout(initBento, 500));
+  </script>
+
+</body>
+</html>
