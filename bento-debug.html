@@ -85,48 +85,55 @@
   </div>
 
   <script>
-    gsap.registerPlugin(ScrollTrigger, Flip);
+  gsap.registerPlugin(ScrollTrigger, Flip);
 
-    let flipCtx;
+  let flipCtx;
 
-    function init() {
-      if (flipCtx) flipCtx.revert();
+  function init() {
+    if (flipCtx) flipCtx.revert();
 
-      const gallery = document.getElementById("gallery-8");
-      const wrap = gallery.parentElement;
+    const gallery = document.getElementById("gallery-8");
+    const wrap = gallery.parentElement;
 
-      gallery.classList.remove("gallery--final");
+    // Make sure we start in bento (small) state
+    gallery.classList.remove("gallery--final");
 
-      flipCtx = gsap.context(() => {
-        const state = Flip.getState(gallery.children);
+    flipCtx = gsap.context(() => {
+      // Capture the START state (small bento)
+      const startState = Flip.getState(gallery.children);
 
-        gallery.classList.add("gallery--final");
+      // Switch to final state (expanded)
+      gallery.classList.add("gallery--final");
 
-        Flip.to(state, {
-          duration: 1,
-          ease: "power2.inOut",
-          simple: true,
-          scrollTrigger: {
-            trigger: wrap,
-            start: "top top",
-            end: "+=200%",
-            scrub: 1,
-            pin: true,
-            pinSpacing: true,
-            invalidateOnRefresh: true
-          }
-        });
+      // Create the flip from small → big
+      Flip.to(startState, {
+        duration: 1.1,
+        ease: "power2.inOut",
+        simple: true,
+        scrollTrigger: {
+          trigger: wrap,
+          start: "top top",
+          end: "+=180%",
+          scrub: 1.1,
+          pin: true,
+          pinSpacing: true,
+          invalidateOnRefresh: true
+        }
       });
-    }
-
-    window.addEventListener("load", () => {
-      ScrollTrigger.config({ ignoreMobileResize: true });
-      ScrollTrigger.normalizeScroll(true);
-      init();
     });
+  }
 
-    window.addEventListener("resize", () => setTimeout(init, 400));
-    window.addEventListener("orientationchange", () => setTimeout(() => { ScrollTrigger.refresh(true); init(); }, 600));
-  </script>
+  window.addEventListener("load", () => {
+    ScrollTrigger.config({ ignoreMobileResize: true });
+    ScrollTrigger.normalizeScroll(true);
+    init();
+  });
+
+  window.addEventListener("resize", () => setTimeout(init, 400));
+  window.addEventListener("orientationchange", () => setTimeout(() => {
+    ScrollTrigger.refresh(true);
+    init();
+  }, 600));
+</script>
 </body>
 </html>
