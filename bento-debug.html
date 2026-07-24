@@ -2,50 +2,38 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bento Debug - Exact CodePen Version</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Bento - Ultra Debug</title>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/Flip.min.js"></script>
 
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:#030303; color:#fff; font-family:sans-serif; line-height:1.5; }
+    body { background:#000; color:#fff; overflow-x:hidden; font-family:sans-serif; }
 
     .info {
-      position: fixed;
-      top: 15px;
-      left: 15px;
-      z-index: 1000;
-      background: rgba(0,0,0,0.8);
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-size: 15px;
-      pointer-events: none;
+      position:fixed; top:10px; left:10px; z-index:1000;
+      background:rgba(255,0,0,0.8); padding:10px; border-radius:6px; font-size:14px;
     }
 
     .gallery-wrap {
-      position: relative;
-      width: 100%;
-      height: 100vh;
+      height: 100dvh;
+      min-height: 100dvh;
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
-      background: #030303;
+      background: #000;
+      position: relative;
+      contain: layout style paint;
     }
 
     .gallery {
-      position: relative;
       width: 100%;
       height: 100%;
-      flex: none;
     }
 
     .gallery__item {
-      background-position: 50% 50%;
-      background-size: cover;
-      flex: none;
       position: relative;
       overflow: hidden;
     }
@@ -54,138 +42,91 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      display: block;
     }
 
     .gallery--bento {
       display: grid;
-      gap: 1vh;
-      grid-template-columns: repeat(3, 32.5vw);
-      grid-template-rows: repeat(4, 23vh);
-      justify-content: center;
-      align-content: center;
+      gap: 8px;
+      grid-template-columns: repeat(3, 32vw);
+      grid-template-rows: repeat(4, 22vh);
     }
 
     .gallery--final.gallery--bento {
       grid-template-columns: repeat(3, 100vw);
-      grid-template-rows: repeat(4, 49.5vh);
-      gap: 1vh;
+      grid-template-rows: repeat(4, 50dvh);
+      gap: 8px;
     }
 
-    /* Grid areas */
-    .gallery--bento .gallery__item:nth-child(1) { grid-area: 1 / 1 / 3 / 2; }
-    .gallery--bento .gallery__item:nth-child(2) { grid-area: 1 / 2 / 2 / 3; }
-    .gallery--bento .gallery__item:nth-child(3) { grid-area: 2 / 2 / 4 / 3; }
-    .gallery--bento .gallery__item:nth-child(4) { grid-area: 1 / 3 / 3 / 3; }
-    .gallery--bento .gallery__item:nth-child(5) { grid-area: 3 / 1 / 3 / 2; }
-    .gallery--bento .gallery__item:nth-child(6) { grid-area: 3 / 3 / 5 / 4; }
-    .gallery--bento .gallery__item:nth-child(7) { grid-area: 4 / 1 / 5 / 2; }
-    .gallery--bento .gallery__item:nth-child(8) { grid-area: 4 / 2 / 5 / 3; }
-
-    .section {
-      padding: 4rem 2rem;
-      background: #111;
-      text-align: center;
-    }
-    .gallery-wrap {
-  height: 100dvh !important;
-  min-height: 100dvh !important;
-  contain: layout style paint;
-}
-
-.gallery__item img {
-  will-change: transform;
-  backface-visibility: hidden;
-}
+    .gallery--bento .gallery__item:nth-child(1) { grid-area: 1/1/3/2; }
+    .gallery--bento .gallery__item:nth-child(2) { grid-area: 1/2/2/3; }
+    .gallery--bento .gallery__item:nth-child(3) { grid-area: 2/2/4/3; }
+    .gallery--bento .gallery__item:nth-child(4) { grid-area: 1/3/3/3; }
+    .gallery--bento .gallery__item:nth-child(5) { grid-area: 3/1/3/2; }
+    .gallery--bento .gallery__item:nth-child(6) { grid-area: 3/3/5/4; }
+    .gallery--bento .gallery__item:nth-child(7) { grid-area: 4/1/5/2; }
+    .gallery--bento .gallery__item:nth-child(8) { grid-area: 4/2/5/3; }
   </style>
 </head>
 <body>
 
-  <div class="info">
-    Bento Debug Test<br>
-    Scroll slowly ↓
-  </div>
+  <div class="info">Bento Ultra Debug - Scroll Slowly</div>
 
   <div class="gallery-wrap">
-    <div class="gallery gallery--bento gallery--switch" id="gallery-8">
-      <div class="gallery__item"><img src="https://assets.codepen.io/16327/portrait-pattern-1.jpg" alt="" /></div>
-      <div class="gallery__item"><img src="https://assets.codepen.io/16327/portrait-image-12.jpg" alt="" /></div>
-      <div class="gallery__item"><img src="https://assets.codepen.io/16327/portrait-image-8.jpg" alt="" /></div>
-      <div class="gallery__item"><img src="https://assets.codepen.io/16327/portrait-pattern-2.jpg" alt="" /></div>
-      <div class="gallery__item"><img src="https://assets.codepen.io/16327/portrait-image-4.jpg" alt="" /></div>
-      <div class="gallery__item"><img src="https://assets.codepen.io/16327/portrait-image-3.jpg" alt="" /></div>
-      <div class="gallery__item"><img src="https://assets.codepen.io/16327/portrait-pattern-3.jpg" alt="" /></div>
-      <div class="gallery__item"><img src="https://assets.codepen.io/16327/portrait-image-1.jpg" alt="" /></div>
+    <div class="gallery gallery--bento" id="gallery-8">
+      <div class="gallery__item"><img src="https://assets.codepen.io/16327/portrait-pattern-1.jpg" alt=""/></div>
+      <div class="gallery__item"><img src="https://assets.codepen.io/16327/portrait-image-12.jpg" alt=""/></div>
+      <div class="gallery__item"><img src="https://assets.codepen.io/16327/portrait-image-8.jpg" alt=""/></div>
+      <div class="gallery__item"><img src="https://assets.codepen.io/16327/portrait-pattern-2.jpg" alt=""/></div>
+      <div class="gallery__item"><img src="https://assets.codepen.io/16327/portrait-image-4.jpg" alt=""/></div>
+      <div class="gallery__item"><img src="https://assets.codepen.io/16327/portrait-image-3.jpg" alt=""/></div>
+      <div class="gallery__item"><img src="https://assets.codepen.io/16327/portrait-pattern-3.jpg" alt=""/></div>
+      <div class="gallery__item"><img src="https://assets.codepen.io/16327/portrait-image-1.jpg" alt=""/></div>
     </div>
   </div>
 
-  <div class="section">
-    <h2>Content After Gallery</h2>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
-    <p>Scroll up and down to test the animation multiple times.</p>
-  </div>
-
   <script>
-    console.clear();
     gsap.registerPlugin(ScrollTrigger, Flip);
 
     let flipCtx;
 
-    const createTween = () => {
-        const galleryElement = document.querySelector("#gallery-8");
-        const galleryItems = galleryElement.querySelectorAll(".gallery__item");
+    function init() {
+      if (flipCtx) flipCtx.revert();
 
-        if (flipCtx) flipCtx.revert();
-        galleryElement.classList.remove("gallery--final");
+      const gallery = document.getElementById("gallery-8");
+      const wrap = gallery.parentElement;
 
-        flipCtx = gsap.context(() => {
-        // Capture final state
-        galleryElement.classList.add("gallery--final");
-        const flipState = Flip.getState(galleryItems, { props: "width,height,borderRadius" });
-        galleryElement.classList.remove("gallery--final");
+      gallery.classList.remove("gallery--final");
 
-        const flip = Flip.to(flipState, {
-            simple: true,
-            ease: "power2.inOut",        // Changed from expoScale
-            duration: 1.2
-        });
+      flipCtx = gsap.context(() => {
+        const state = Flip.getState(gallery.children);
 
-        const tl = gsap.timeline({
-            scrollTrigger: {
-            trigger: galleryElement.parentNode,   // pin the wrapper
+        gallery.classList.add("gallery--final");
+
+        Flip.to(state, {
+          duration: 1,
+          ease: "power2.inOut",
+          simple: true,
+          scrollTrigger: {
+            trigger: wrap,
             start: "top top",
-            end: "+=150%",
-            scrub: 1.2,
+            end: "+=200%",
+            scrub: 1,
             pin: true,
             pinSpacing: true,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-            refreshPriority: -1,
-            }
+            invalidateOnRefresh: true
+          }
         });
-
-        tl.add(flip);
-        });
-    };
+      });
+    }
 
     window.addEventListener("load", () => {
-        ScrollTrigger.config({ ignoreMobileResize: true });
-        createTween();
+      ScrollTrigger.config({ ignoreMobileResize: true });
+      ScrollTrigger.normalizeScroll(true);
+      init();
     });
 
-    let resizeTimer;
-    window.addEventListener("resize", () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(createTween, 400);
-    });
-
-    window.addEventListener("orientationchange", () => {
-        setTimeout(() => {
-        ScrollTrigger.refresh(true);
-        createTween();
-        }, 600);
-    });
-    </script>
-
+    window.addEventListener("resize", () => setTimeout(init, 400));
+    window.addEventListener("orientationchange", () => setTimeout(() => { ScrollTrigger.refresh(true); init(); }, 600));
+  </script>
 </body>
 </html>
