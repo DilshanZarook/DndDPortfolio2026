@@ -287,7 +287,6 @@
     position: relative;
     width: 100%;
     height: 100vh;
-    height: 100dvh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -430,7 +429,6 @@
     position: relative;
     width: 100%;
     height: 100vh;
-    height: 100dvh;
     overflow: hidden;
     background: #030303;
   }
@@ -470,16 +468,15 @@
 .gallery-wrap,
 .hg-wrap {
   height: 100vh;
-  height: 100dvh;
   min-height: 100vh;
-  min-height: 100dvh;
 }
 
-.gallery-wrap {
-  margin-bottom: 20vh;
-}
-.hg-wrap {
-  margin-bottom: 20vh;
+/* Smooth release */
+.gallery-wrap::after,
+.hg-wrap::after {
+  content: '';
+  display: block;
+  height: 20vh;
 }
 </style>
 <section class="section hg-section">
@@ -667,11 +664,11 @@
 
       const tl = gsap.timeline({
         scrollTrigger: {
-          trigger: gallery,
-          start: "center center",
-          end: "+=100%",
-          scrub: true,
-          pin: wrap,
+          trigger: wrap,
+          start: "top top",
+          end: "+=150%",           // Increased for smoother feel
+          scrub: 1,                 // Smoother scrubbing
+          pin: true,
           pinSpacing: true,
           anticipatePin: 1,
           invalidateOnRefresh: true,
