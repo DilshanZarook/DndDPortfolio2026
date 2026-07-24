@@ -65,6 +65,15 @@
     .gallery--bento .gallery__item:nth-child(6) { grid-area: 3/3/5/4; }
     .gallery--bento .gallery__item:nth-child(7) { grid-area: 4/1/5/2; }
     .gallery--bento .gallery__item:nth-child(8) { grid-area: 4/2/5/3; }
+
+    .gallery-wrap {
+        height: 100dvh;
+        min-height: 100dvh;
+        }
+
+    .gallery--final.gallery--bento {
+    grid-template-rows: repeat(4, 49.5dvh);
+    }
   </style>
 </head>
 <body>
@@ -89,51 +98,50 @@
 
   let flipCtx;
 
-  function init() {
+  const createTween = () => {
+    const galleryElement = document.querySelector("#gallery-8");
+    const galleryItems = galleryElement.querySelectorAll(".gallery__item");
+
     if (flipCtx) flipCtx.revert();
 
-    const gallery = document.getElementById("gallery-8");
-    const wrap = gallery.parentElement;
-
-    // Make sure we start in bento (small) state
-    gallery.classList.remove("gallery--final");
+    // Start in small state
+    galleryElement.classList.remove("gallery--final");
 
     flipCtx = gsap.context(() => {
-      // Capture the START state (small bento)
-      const startState = Flip.getState(gallery.children);
+      // Capture small (bento) state FIRST
+      const startState = Flip.getState(galleryItems);
 
-      // Switch to final state (expanded)
-      gallery.classList.add("gallery--final");
+      // Go to expanded state
+      galleryElement.classList.add("gallery--final");
 
-      // Create the flip from small → big
-      Flip.to(startState, {
-        duration: 1.1,
-        ease: "power2.inOut",
+      // Flip from small → large
+      const flip = Flip.to(startState, {
         simple: true,
+        ease: "power2.inOut",        // smoother on mobile
+        duration: 1.2
+      });
+
+      gsap.timeline({
         scrollTrigger: {
-          trigger: wrap,
+          trigger: galleryElement.parentNode,
           start: "top top",
-          end: "+=180%",
-          scrub: 1.1,
+          end: "+=150%",
+          scrub: 1,
           pin: true,
           pinSpacing: true,
           invalidateOnRefresh: true
         }
-      });
+      }).add(flip);
     });
-  }
+  };
 
   window.addEventListener("load", () => {
     ScrollTrigger.config({ ignoreMobileResize: true });
-    ScrollTrigger.normalizeScroll(true);
-    init();
+    createTween();
   });
 
-  window.addEventListener("resize", () => setTimeout(init, 400));
-  window.addEventListener("orientationchange", () => setTimeout(() => {
-    ScrollTrigger.refresh(true);
-    init();
-  }, 600));
+  window.addEventListener("resize", () => setTimeout(createTween, 300));
+  window.addEventListener("orientationchange", () => setTimeout(createTween, 500));
 </script>
 </body>
 </html>
