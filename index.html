@@ -478,6 +478,17 @@
   display: block;
   height: 20vh;
 }
+
+/*added for portrait gallery*/
+.gallery-wrap {
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  overflow: hidden;
+}
+
+.gallery--final.gallery--bento {
+  grid-template-rows: repeat(4, 49.5dvh) !important; /* use dvh */
+}
 </style>
 <section class="section hg-section">
   <div class="gallery-intro">
@@ -629,59 +640,56 @@
      Not part of the original Webflow export; loaded from the public GSAP CDN. -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/Flip.min.js" type="text/javascript"></script>
 <script>
-/* ============================================================
-   FIXED: Scrubbed Bento Gallery
-   ============================================================ */
-(function () {
-  if (!window.gsap || !window.Flip || !window.ScrollTrigger) return;
-  gsap.registerPlugin(ScrollTrigger, Flip);
+  (function () {
+    if (!gsap || !Flip || !ScrollTrigger) return;
 
-  let flipCtx;
-
-  function createGalleryScrollEffect() {
-    const gallery = document.querySelector("#gallery-portfolio");
+    let flipCtx;
+    const gallery = document.getElementById("gallery-portfolio");
     if (!gallery) return;
 
-    flipCtx && flipCtx.revert();
+    function createBento() {
+      if (flipCtx) flipCtx.revert();
 
-    const items = gallery.querySelectorAll(".gallery__item");
-    const wrap = gallery.closest(".gallery-wrap");
+      const wrap = gallery.closest(".gallery-wrap");
+      const items = gallery.querySelectorAll(".gallery__item");
 
-    // Reset
-    gallery.classList.remove("gallery--final");
-
-    flipCtx = gsap.context(() => {
-      // Capture final state
-      gallery.classList.add("gallery--final");
-      const state = Flip.getState(items);
+      // Reset
       gallery.classList.remove("gallery--final");
 
-      const flip = Flip.to(state, {
-        simple: true,
-        ease: "power2.inOut",
-        duration: 1
-      });
+      flipCtx = gsap.context(() => {
+        const state = Flip.getState(items);
 
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: wrap,
-          start: "top top",
-          end: "+=150%",           // Increased for smoother feel
-          scrub: 1,                 // Smoother scrubbing
-          pin: true,
-          pinSpacing: true,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-        }
-      });
+        gallery.classList.add("gallery--final");
 
-      tl.add(flip);
+        Flip.to(state, {
+          duration: 1.1,
+          ease: "power2.inOut",
+          simple: true,
+          scrollTrigger: {
+            trigger: wrap,
+            start: "top top",
+            end: "+=160%",
+            scrub: 1,
+            pin: true,
+            pinSpacing: true,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+          }
+        });
+      });
+    }
+
+    // Run it
+    window.addEventListener("load", createBento);
+
+    // Refresh on resize/orientation
+    let timer;
+    window.addEventListener("resize", () => {
+      clearTimeout(timer);
+      timer = setTimeout(createBento, 250);
     });
-  }
-
-  window.addEventListener("load", createGalleryScrollEffect);
-  window.addEventListener("resize", createGalleryScrollEffect);
-})();
+    window.addEventListener("orientationchange", () => setTimeout(createBento, 400));
+  })();
 </script>
 <script>
 /* ============================================================
