@@ -478,17 +478,6 @@
   display: block;
   height: 20vh;
 }
-
-/*added for portrait gallery*/
-.gallery-wrap {
-  height: 100dvh !important;
-  min-height: 100dvh !important;
-  overflow: hidden;
-}
-
-.gallery--final.gallery--bento {
-  grid-template-rows: repeat(4, 49.5dvh) !important; /* use dvh */
-}
 </style>
 <section class="section hg-section">
   <div class="gallery-intro">
@@ -640,56 +629,59 @@
      Not part of the original Webflow export; loaded from the public GSAP CDN. -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/Flip.min.js" type="text/javascript"></script>
 <script>
-  (function () {
-    if (!gsap || !Flip || !ScrollTrigger) return;
+/* ============================================================
+   FIXED: Scrubbed Bento Gallery
+   ============================================================ */
+(function () {
+  if (!window.gsap || !window.Flip || !window.ScrollTrigger) return;
+  gsap.registerPlugin(ScrollTrigger, Flip);
 
-    let flipCtx;
-    const gallery = document.getElementById("gallery-portfolio");
+  let flipCtx;
+
+  function createGalleryScrollEffect() {
+    const gallery = document.querySelector("#gallery-portfolio");
     if (!gallery) return;
 
-    function createBento() {
-      if (flipCtx) flipCtx.revert();
+    flipCtx && flipCtx.revert();
 
-      const wrap = gallery.closest(".gallery-wrap");
-      const items = gallery.querySelectorAll(".gallery__item");
+    const items = gallery.querySelectorAll(".gallery__item");
+    const wrap = gallery.closest(".gallery-wrap");
 
-      // Reset
+    // Reset
+    gallery.classList.remove("gallery--final");
+
+    flipCtx = gsap.context(() => {
+      // Capture final state
+      gallery.classList.add("gallery--final");
+      const state = Flip.getState(items);
       gallery.classList.remove("gallery--final");
 
-      flipCtx = gsap.context(() => {
-        const state = Flip.getState(items);
-
-        gallery.classList.add("gallery--final");
-
-        Flip.to(state, {
-          duration: 1.1,
-          ease: "power2.inOut",
-          simple: true,
-          scrollTrigger: {
-            trigger: wrap,
-            start: "top top",
-            end: "+=160%",
-            scrub: 1,
-            pin: true,
-            pinSpacing: true,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-          }
-        });
+      const flip = Flip.to(state, {
+        simple: true,
+        ease: "power2.inOut",
+        duration: 1
       });
-    }
 
-    // Run it
-    window.addEventListener("load", createBento);
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: wrap,
+          start: "top top",
+          end: "+=150%",           // Increased for smoother feel
+          scrub: 1,                 // Smoother scrubbing
+          pin: true,
+          pinSpacing: true,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+        }
+      });
 
-    // Refresh on resize/orientation
-    let timer;
-    window.addEventListener("resize", () => {
-      clearTimeout(timer);
-      timer = setTimeout(createBento, 250);
+      tl.add(flip);
     });
-    window.addEventListener("orientationchange", () => setTimeout(createBento, 400));
-  })();
+  }
+
+  window.addEventListener("load", createGalleryScrollEffect);
+  window.addEventListener("resize", createGalleryScrollEffect);
+})();
 </script>
 <script>
 /* ============================================================
